@@ -1,6 +1,7 @@
 from flask import Flask,jsonify,request
 import json
 import pandas as pd
+import numpy as np
 from pandas import json_normalize
 app =   Flask(__name__)
 
@@ -33,6 +34,7 @@ def upload_json():
         
     def data_Building():
         df_Building=df1[["Building","Dep_Kwh_m2_an","Consommation","Solaire_Totale"]]
+        df_Building.sort_values(by='Building', ascending=True,inplace=True)
         json_Building=df_Building.to_dict(orient='records')
         return json_Building
 
@@ -96,22 +98,51 @@ def upload_json():
     CC['record']=''
     for i in range (0,len(CC)):
         CC['record'][i]=i
-
+    
+    CC_Values=["SC","DNSH","LowPerformance"]
     def data_CCA():
         CCA=CC.groupby(['CC_Adaptation'])['record'].count()
         countCCA=CCA.sum()
         jsonCCA=(CCA/countCCA).round(2)
         jsonCCA=jsonCCA.to_dict()
+        for i in CC_Values:
+            if i not in jsonCCA:
+                jsonCCA[i]=0
         return jsonCCA
     def data_CCM():
         CCM=CC.groupby(['CC_Mitigation'])['record'].count()
         countCCM=CCM.sum()
         jsonCCM=(CCM/countCCM).round(2)
         jsonCCM=jsonCCM.to_dict()
+        for i in CC_Values:
+            if i not in jsonCCM:
+                jsonCCM[i]=0
+
         return jsonCCM
+
+ 
+    def data_BuildingYear(df_Performance):
+        df_Performance=df_Performance[df_Performance['Year']>2020]
+        df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
+        df_Performance['Energy_Consumption_predicted']=df_Performance['Energy_Consumption_predicted'].astype('double').round(2)
+        df_Performance['Energy_Consumption_predicted']=df_Performance['Energy_Consumption_predicted'].fillna(0)
+        df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
+        df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
+        df_Performance.reset_index(inplace=True)
+        df_Performance
+        for i in range(0,len(df_Performance)):
+                if df_Performance['Consommation'][i]== 0:
+                        df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
+                else:
+                        df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
+        df_BuildingPearYear=df_Performance[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
+        df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].round(2)
+        df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
+        jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
+        return jsonBuildingPerYear
+        
     
-    
-    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building()}
+    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance)}
     return jsonify(Output)
   
 if __name__=='__main__':
