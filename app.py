@@ -141,8 +141,14 @@ def upload_json():
         jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
         return jsonBuildingPerYear
         
-    
-    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance)}
+    def data_SavingQuarterly():
+        df_SavingQuarterly=df_SavingQuarterly.groupby(['Year','Quarter'])['Eco_Total_','Montant_Total_'].sum()
+        df_SavingQuarterly.reset_index(inplace=True)
+        df_SavingQuarterly['Saving_SelfConsumption']=(df_SavingQuarterly['Eco_Total_']/df_SavingQuarterly['Montant_Total_'])*100
+        jsonSavingQuarterly=df_SavingQuarterly.to_dict(orient='records')
+        return jsonSavingQuarterly
+        
+    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly()}
     return jsonify(Output)
   
 if __name__=='__main__':
