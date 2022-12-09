@@ -11,6 +11,7 @@ def upload_json():
     df_Input =json_normalize(Input['Input'])
     df_EUTaxonomie = json_normalize(Input['EU_Taxonomy_version1'])
     df_Performance=json_normalize(Input['Draft_Performance_Tracking_Global+Predicted'])
+    df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
     df1=pd.merge(df_Input,df_EUTaxonomie, how='right', on = 'Building')
     df2=pd.merge(df_Input,df_Performance, how='right', on = 'Building')
     df1['Solaire']=df1['Solaire'].astype('double').fillna(0)
@@ -142,6 +143,7 @@ def upload_json():
         return jsonBuildingPerYear
         
     def data_SavingQuarterly():
+        df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
         df_SavingQuarterly=df_SavingQuarterly.groupby(['Year','Quarter'])['Eco_Total_','Montant_Total_'].sum()
         df_SavingQuarterly.reset_index(inplace=True)
         df_SavingQuarterly['Saving_SelfConsumption']=(df_SavingQuarterly['Eco_Total_']/df_SavingQuarterly['Montant_Total_'])*100
