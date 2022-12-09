@@ -141,15 +141,18 @@ def upload_json():
         df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
         jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
         return jsonBuildingPerYear
-        
+
+    
     def data_SavingQuarterly():
         df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
         df_SavingQuarterly=df_SavingQuarterly.groupby(['Year','Quarter'])['Eco_Total_','Montant_Total_'].sum()
         df_SavingQuarterly.reset_index(inplace=True)
         df_SavingQuarterly['Saving_SelfConsumption']=(df_SavingQuarterly['Eco_Total_']/df_SavingQuarterly['Montant_Total_'])*100
+        df_SavingQuarterly['Saving_SelfConsumption']=df_SavingQuarterly['Saving_SelfConsumption'].round(2)
+        df_SavingQuarterly=df_SavingQuarterly[['Year','Quarter','Saving_SelfConsumption']]
         jsonSavingQuarterly=df_SavingQuarterly.to_dict(orient='records')
         return jsonSavingQuarterly
-        
+            
     Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly()}
     return jsonify(Output)
   
