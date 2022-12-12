@@ -129,6 +129,8 @@ def upload_json():
         df_Performance['Energy_Consumption_predicted']=df_Performance['Energy_Consumption_predicted'].fillna(0)
         df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
         df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
+        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].astype('double').round(2)
+        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].fillna(0)
         df_Performance.reset_index(inplace=True)
         df_Performance
         for i in range(0,len(df_Performance)):
