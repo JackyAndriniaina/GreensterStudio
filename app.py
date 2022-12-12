@@ -5,7 +5,7 @@ import numpy as np
 from pandas import json_normalize
 app =   Flask(__name__)
 
-@app.route('/json', methods=['POST'])
+@app.route('/up_json', methods=['POST'])
 def upload_json():
     Input=request.json
     df_Input =json_normalize(Input['Input'])
