@@ -32,10 +32,13 @@ def upload_json():
         json_Energie['Self-Consumption_Rate']=((df1['Solaire_Totale'].sum()/df1['Consommation'].sum())*100).round(2)
         json_Energie['Saving_Self_Conso']=df1['Saving_Self_Conso'].sum().round(2)
         return json_Energie
-        
     def data_Building():
-        df_Building=df1[["Building","Dep_Kwh_m2_an","Consommation","Solaire_Totale"]]
+        df_Building=df1
         df_Building.sort_values(by='Building', ascending=True,inplace=True)
+        df_Building['Dep_Kwh_m2_an']=df_Building['Dep_Kwh_m2_an'].astype('double').fillna(0).round(2)
+        df_Building['Solaire_Totale']=df_Building['Solaire_Totale'].astype('double').fillna(0).round(2)
+        df_Building=pd.merge(df_Input,df_Building, how='left', on = 'Building')
+        df_Building=df_Building[["Building","Dep_Kwh_m2_an","Consommation","Solaire_Totale"]]
         json_Building=df_Building.to_dict(orient='records')
         return json_Building
 
@@ -104,7 +107,7 @@ def upload_json():
     def data_CCA():
         CCA=CC.groupby(['CC_Adaptation'])['record'].count()
         countCCA=CCA.sum()
-        jsonCCA=(CCA/countCCA).round(2)
+        jsonCCA=((CCA/countCCA)*100).round(2)
         jsonCCA=jsonCCA.to_dict()
         for i in CC_Values:
             if i not in jsonCCA:
@@ -113,12 +116,11 @@ def upload_json():
     def data_CCM():
         CCM=CC.groupby(['CC_Mitigation'])['record'].count()
         countCCM=CCM.sum()
-        jsonCCM=(CCM/countCCM).round(2)
+        jsonCCM=((CCM/countCCM)*100).round(2)
         jsonCCM=jsonCCM.to_dict()
         for i in CC_Values:
             if i not in jsonCCM:
                 jsonCCM[i]=0
-
         return jsonCCM
 
  
@@ -154,8 +156,16 @@ def upload_json():
         df_SavingQuarterly=df_SavingQuarterly[['Year','Quarter','Saving_SelfConsumption']]
         jsonSavingQuarterly=df_SavingQuarterly.to_dict(orient='records')
         return jsonSavingQuarterly
-            
-    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly()}
+
+    def Conso_VS_Solar():
+        df_Conso_vs_Solar=df1
+        df_Conso_vs_Solar=pd.merge(df_Input,df_Conso_vs_Solar, how='left', on = 'Building')
+        df_Conso_vs_Solar=df_Conso_vs_Solar[['Building','Solaire_Totale','Consommation']]
+        df_Conso_vs_Solar=df_Conso_vs_Solar.melt(id_vars='Building', var_name="Label", value_name="Value")
+        json_Conso_vs_Solar=df_Conso_vs_Solar.to_dict(orient='records')
+        return json_Conso_vs_Solar
+                
+    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly(),'Conso_vs_Solar':Conso_VS_Solar()}
     return jsonify(Output)
   
 if __name__=='__main__':
