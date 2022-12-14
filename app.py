@@ -122,7 +122,6 @@ def upload_json():
             if i not in jsonCCM:
                 jsonCCM[i]=0
         return jsonCCM
-
     df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
         df_Performance=df_Performance[df_Performance['Year']>2020]
