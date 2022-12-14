@@ -123,7 +123,6 @@ def upload_json():
                 jsonCCM[i]=0
         return jsonCCM
 
-
     df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
         df_Performance=df_Performance[df_Performance['Year']>2020]
@@ -140,7 +139,9 @@ def upload_json():
                         df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
                 else:
                         df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
-        df_BuildingPearYear=df_Performance[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
+        df_BuildingPearYear=df_Performance
+        df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
+        df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
         df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].round(2)
         df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
         df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
