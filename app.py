@@ -123,7 +123,8 @@ def upload_json():
                 jsonCCM[i]=0
         return jsonCCM
 
- 
+
+    df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
         df_Performance=df_Performance[df_Performance['Year']>2020]
         df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
@@ -134,7 +135,6 @@ def upload_json():
         df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].astype('double').round(2)
         df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].fillna(0)
         df_Performance.reset_index(inplace=True)
-        df_Performance
         for i in range(0,len(df_Performance)):
                 if df_Performance['Consommation'][i]== 0:
                         df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
@@ -142,6 +142,7 @@ def upload_json():
                         df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
         df_BuildingPearYear=df_Performance[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
         df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].round(2)
+        df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
         df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
         jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
         return jsonBuildingPerYear
