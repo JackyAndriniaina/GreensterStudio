@@ -13,25 +13,32 @@ def upload_json():
     df_Performance=json_normalize(Input['Draft_Performance_Tracking_Global+Predicted'])
     df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
     df1=pd.merge(df_Input,df_EUTaxonomie, how='right', on = 'Building')
+    df1_Input=pd.merge(df_Input,df_EUTaxonomie, how='right', on = 'Building')
     df2=pd.merge(df_Input,df_Performance, how='right', on = 'Building')
     df1['Solaire']=df1['Solaire'].astype('double').fillna(0)
     df1['Solaire_(panneaux_Pv)']=df1['Solaire_(panneaux_Pv)'].astype('double').fillna(0)
     df1['Solaire_Totale']=df1['Solaire']+df1['Solaire_(panneaux_Pv)']
-    
+    df1_Input['Solaire']=df1_Input['Solaire'].astype('double').fillna(0)
+    df1_Input['Solaire_(panneaux_Pv)']=df1_Input['Solaire_(panneaux_Pv)'].astype('double').fillna(0)
+    df1_Input['Solaire_Totale']=df1_Input['Solaire']+df1_Input['Solaire_(panneaux_Pv)']
+   
     def data_Energie():
-        df1['Quotation']=df1['Quotation'].astype('double').fillna(0)
-        for i in range (0,len(df1)):
-            if df1['Quotation'][i]!=0:
-                df1['Quotation'][i]=df1['Quotation'][i]
+        df1_Input['Quotation']=df1_Input['Quotation'].astype('double').fillna(0)
+        for i in range (0,len(df1_Input)):
+            if df1_Input['Quotation'][i]!=0:
+                df1_Input['Quotation'][i]=df1_Input['Quotation'][i]
             else:
-                df1['Quotation'][i]=0.131
+                df1_Input['Quotation'][i]=0.131
                 
-        df1['Saving_Self_Conso']=df1['Solaire_Totale']*df1['Quotation']
+        df1_Input['Saving_Self_Conso']=df1_Input['Solaire_Totale']*df1_Input['Quotation']
         json_Energie={}
-        json_Energie['Volume_Of_Generated_KWh']=df1['Solaire_Totale'].sum().round(2)
-        json_Energie['Self-Consumption_Rate']=((df1['Solaire_Totale'].sum()/df1['Consommation'].sum())*100).round(2)
-        json_Energie['Saving_Self_Conso']=df1['Saving_Self_Conso'].sum().round(2)
+        json_Energie['Volume_Of_Generated_KWh']=df1_Input['Solaire_Totale'].sum().round(2)
+        json_Energie['Volume_Of_Generated_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Solaire_(panneaux_Pv)'].sum())*100).round(2)
+        json_Energie['Self-Consumption_Rate']=((df1_Input['Solaire_Totale'].sum()/df1_Input['Consommation'].sum())*100).round(2)
+        json_Energie['Self-Conso_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Consommation'].sum())).round(2)
+        json_Energie['Saving_Self_Conso']=df1_Input['Saving_Self_Conso'].sum().round(2)
         return json_Energie
+
     def data_Building():
         df_Building=df1
         df_Building.sort_values(by='Building', ascending=True,inplace=True)
@@ -103,6 +110,7 @@ def upload_json():
     for i in range (0,len(CC)):
         CC['record'][i]=i
     
+    
     CC_Values=["SC","DNSH","LowPerformance"]
     def data_CCA():
         CCA=CC.groupby(['CC_Adaptation'])['record'].count()
@@ -112,6 +120,9 @@ def upload_json():
         for i in CC_Values:
             if i not in jsonCCA:
                 jsonCCA[i]=0
+        jsonCCA['SC_vs_default']=10
+        jsonCCA['DNSH_vs_default']=10
+        jsonCCA['LowP_vs_default']=10
         return jsonCCA
     def data_CCM():
         CCM=CC.groupby(['CC_Mitigation'])['record'].count()
@@ -121,7 +132,14 @@ def upload_json():
         for i in CC_Values:
             if i not in jsonCCM:
                 jsonCCM[i]=0
+        jsonCCM['SC_vs_default']=10
+        jsonCCM['DNSH_vs_default']=10
+        jsonCCM['LowP_vs_default']=10
+        
+
         return jsonCCM
+
+
     df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
         df_Performance=df_Performance[df_Performance['Year']>2020]
