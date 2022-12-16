@@ -161,6 +161,10 @@ def upload_json():
         df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
         df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].round(2)
         df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
+        df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].fillna(0)
+        df_BuildingPearYear['Consommation']=df_BuildingPearYear['Consommation'].fillna(0)
+        df_BuildingPearYear['Year']=df_BuildingPearYear['Year'].fillna(0)
+        df_BuildingPearYear['Month']=df_BuildingPearYear['Month'].fillna(0)
         jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
         return jsonBuildingPerYear
 
