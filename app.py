@@ -21,7 +21,7 @@ def upload_json():
     df1_Input['Solaire']=df1_Input['Solaire'].astype('double').fillna(0)
     df1_Input['Solaire_(panneaux_Pv)']=df1_Input['Solaire_(panneaux_Pv)'].astype('double').fillna(0)
     df1_Input['Solaire_Totale']=df1_Input['Solaire']+df1_Input['Solaire_(panneaux_Pv)']
-   
+ 
     def data_Energie():
         df1_Input['Quotation']=df1_Input['Quotation'].astype('double').fillna(0)
         for i in range (0,len(df1_Input)):
@@ -32,9 +32,9 @@ def upload_json():
         df1_Input['Saving_Self_Conso']=df1_Input['Solaire_Totale']*df1_Input['Quotation']
         json_Energie={}
         json_Energie['Volume_Of_Generated_KWh']=df1_Input['Solaire_Totale'].sum().round(2)
-        json_Energie['Volume_Of_Generated_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Solaire_(panneaux_Pv)'].sum())*100).round(2)
+        json_Energie['Volume_Of_Generated_vs_default']=((df1_Input['Solaire'].sum()*100)/df1_Input['Solaire_(panneaux_Pv)'].sum()).round(2)
         json_Energie['Self-Consumption_Rate']=((df1_Input['Solaire_Totale'].sum()/df1_Input['Consommation'].sum())*100).round(2)
-        json_Energie['Self-Conso_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Consommation'].sum())).round(2)
+        json_Energie['Self-Conso_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Consommation'].sum())*100).round(2)
         json_Energie['Saving_Self_Conso']=df1_Input['Saving_Self_Conso'].sum().round(2)
         return json_Energie
 
