@@ -28,8 +28,7 @@ def upload_json():
             if df1_Input['Quotation'][i]!=0:
                 df1_Input['Quotation'][i]=df1_Input['Quotation'][i]
             else:
-                df1_Input['Quotation'][i]=0.131
-                
+                df1_Input['Quotation'][i]=0.131   
         df1_Input['Saving_Self_Conso']=df1_Input['Solaire_Totale']*df1_Input['Quotation']
         json_Energie={}
         json_Energie['Volume_Of_Generated_KWh']=df1_Input['Solaire_Totale'].sum().round(2)
@@ -46,8 +45,24 @@ def upload_json():
         df_Building['Solaire_Totale']=df_Building['Solaire_Totale'].astype('double').fillna(0).round(2)
         df_Building=pd.merge(df_Input,df_Building, how='left', on = 'Building')
         df_Building=df_Building[["Building","Dep_Kwh_m2_an","Consommation","Solaire_Totale"]]
+        convert_dict={"Building":str,"Dep_Kwh_m2_an":float,"Consommation":float,"Solaire_Totale":float}
+        arround={"Building":2,"Dep_Kwh_m2_an":2,"Consommation":2,"Solaire_Totale":2}
+        df_Building=df_Building.astype(convert_dict)
+        df_Building=df_Building.round(arround)
         json_Building=df_Building.to_dict(orient='records')
         return json_Building
+
+    def Conso_VS_Solar():
+        df_Conso_vs_Solar=df1
+        df_Conso_vs_Solar=pd.merge(df_Input,df_Conso_vs_Solar, how='left', on = 'Building')
+        df_Conso_vs_Solar=df_Conso_vs_Solar[['Building','Solaire_Totale','Consommation']]
+        df_Conso_vs_Solar=df_Conso_vs_Solar.melt(id_vars='Building', var_name="Label", value_name="Value")
+        convert_dict={"Building":str,"Label":str,"Value":float}
+        arround={"Value":2}
+        df_Conso_vs_Solar=df_Conso_vs_Solar.astype(convert_dict)
+        df_Conso_vs_Solar=df_Conso_vs_Solar.round(arround)
+        json_Conso_vs_Solar=df_Conso_vs_Solar.to_dict(orient='records')
+        return json_Conso_vs_Solar
 
     jsonClassOnEmission='''[{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": "SC","Class ": "A","Min CO2-m2-an": 0,"Max CO2-m2-an": 6,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "B","Min CO2-m2-an": 6,"Max CO2-m2-an": 11,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "C","Min CO2-m2-an": 11,"Max CO2-m2-an": 30,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "D","Min CO2-m2-an": 30,"Max CO2-m2-an": 50,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "E","Min CO2-m2-an": 50,"Max CO2-m2-an": 70,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "F","Min CO2-m2-an": 70,"Max CO2-m2-an": 100,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "G","Min CO2-m2-an": 100,"Max CO2-m2-an": 500000,"Type_Du_Batiment": "habitation"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": "SC","Class ": "A","Min CO2-m2-an": 0,"Max CO2-m2-an": 6,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "B","Min CO2-m2-an": 6,"Max CO2-m2-an": 15,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "C","Min CO2-m2-an": 16,"Max CO2-m2-an": 25,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "D","Min CO2-m2-an": 26,"Max CO2-m2-an": 35,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "E","Min CO2-m2-an": 36,"Max CO2-m2-an": 55,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "F","Min CO2-m2-an": 56,"Max CO2-m2-an": 80,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "G","Min CO2-m2-an": 81,"Max CO2-m2-an": 500000,"Type_Du_Batiment": "centre commercial"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": "SC","Class ": "A","Min CO2-m2-an": 0,"Max CO2-m2-an": 6,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "B","Min CO2-m2-an": 6,"Max CO2-m2-an": 15,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": "DNSH","SC_CC_Mitigation": 0,"Class ": "C","Min CO2-m2-an": 16,"Max CO2-m2-an": 30,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "D","Min CO2-m2-an": 31,"Max CO2-m2-an": 60,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "E","Min CO2-m2-an": 61,"Max CO2-m2-an": 100,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "F","Min CO2-m2-an": 101,"Max CO2-m2-an": 145,"Type_Du_Batiment": "bureau"},{"DNSH_CC__Mitigation": 0,"SC_CC_Mitigation": 0,"Class ": "G","Min CO2-m2-an": 145,"Max CO2-m2-an": 500000,"Type_Du_Batiment": "bureau"}]'''
     df_ClassOnEmission=pd.read_json(jsonClassOnEmission, orient ='records')
@@ -85,6 +100,10 @@ def upload_json():
         Global["Pourcentage_Capex"]=(Global['Capex']/Global['Capex'].sum()*100).round(2)
         Global["Pourcentage_Opex"]=(Global['Opex_Totale']/Global['Opex_Totale'].sum()*100).round(2)
         Global.reset_index(inplace=True)
+        convert_dict={'Taxonomy':str,'Pourcentage_Turnover':float,'Pourcentage_Capex':float,'Pourcentage_Opex':float}
+        arround={'Pourcentage_Turnover':2,'Pourcentage_Capex':2,'Pourcentage_Opex':2}
+        Global=Global.astype(convert_dict)
+        Global=Global.round(arround)
         json_Global=Global[['Taxonomy','Pourcentage_Turnover','Pourcentage_Capex','Pourcentage_Opex']].to_dict(orient='records')
         return json_Global
 
@@ -123,6 +142,11 @@ def upload_json():
         jsonCCA['SC_vs_default']=10
         jsonCCA['DNSH_vs_default']=10
         jsonCCA['LowP_vs_default']=10
+        res={}
+        for k, v in jsonCCA.items():
+            jsonCCA[k] = float(v)
+            res[k] = round(jsonCCA[k], 2)
+        jsonCCA=res
         return jsonCCA
     def data_CCM():
         CCM=CC.groupby(['CC_Mitigation'])['record'].count()
@@ -135,38 +159,36 @@ def upload_json():
         jsonCCM['SC_vs_default']=10
         jsonCCM['DNSH_vs_default']=10
         jsonCCM['LowP_vs_default']=10
-        
-
+        res={}
+        for k, v in jsonCCM.items():
+            jsonCCM[k] = float(v)
+            res[k] = round(jsonCCM[k], 2)
+        jsonCCM=res
         return jsonCCM
 
 
     df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
-        df_Performance=df_Performance[df_Performance['Year']>2020]
-        df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
-        df_Performance['Energy_Consumption_predicted']=df_Performance['Energy_Consumption_predicted'].astype('double').round(2)
-        df_Performance['Energy_Consumption_predicted']=df_Performance['Energy_Consumption_predicted'].fillna(0)
-        df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
-        df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
-        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].astype('double').round(2)
-        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].fillna(0)
-        df_Performance.reset_index(inplace=True)
-        for i in range(0,len(df_Performance)):
-                if df_Performance['Consommation'][i]== 0:
-                        df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
-                else:
-                        df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
-        df_BuildingPearYear=df_Performance
-        df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
-        df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
-        df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].round(2)
-        df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
-        df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_BuildingPearYear['Emission_Ges:_Scope_1_Plus_2(Kg)'].fillna(0)
-        df_BuildingPearYear['Consommation']=df_BuildingPearYear['Consommation'].fillna(0)
-        df_BuildingPearYear['Year']=df_BuildingPearYear['Year'].fillna(0)
-        df_BuildingPearYear['Month']=df_BuildingPearYear['Month'].fillna(0)
-        jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
-        return jsonBuildingPerYear
+            df_Performance=df_Performance[df_Performance['Year']>2020]
+            df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
+            df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
+            df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
+            df_Performance.reset_index(inplace=True)
+            for i in range(0,len(df_Performance)):
+                    if df_Performance['Consommation'][i]== 0:
+                            df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
+                    else:
+                            df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
+            df_BuildingPearYear=df_Performance
+            df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
+            df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
+            df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
+            convert_dict={"Building":str,"Consommation":float,"Emission_Ges:_Scope_1_Plus_2(Kg)":float,"Year":int,"Month":int}
+            arround={"Consommation":2,"Emission_Ges:_Scope_1_Plus_2(Kg)":2}
+            df_BuildingPearYear=df_BuildingPearYear.astype(convert_dict)
+            df_BuildingPearYear=df_BuildingPearYear.round(arround)
+            jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
+            return jsonBuildingPerYear
 
     
     def data_SavingQuarterly():
@@ -176,16 +198,13 @@ def upload_json():
         df_SavingQuarterly['Saving_SelfConsumption']=(df_SavingQuarterly['Eco_Total_']/df_SavingQuarterly['Montant_Total_'])*100
         df_SavingQuarterly['Saving_SelfConsumption']=df_SavingQuarterly['Saving_SelfConsumption'].round(2)
         df_SavingQuarterly=df_SavingQuarterly[['Year','Quarter','Saving_SelfConsumption']]
+        convert_dict={'Year':int,'Quarter':str,'Saving_SelfConsumption':float}
+        arround={'Saving_SelfConsumption':2}
+        df_SavingQuarterly=df_SavingQuarterly.astype(convert_dict)
+        df_SavingQuarterly=df_SavingQuarterly.round(arround)
         jsonSavingQuarterly=df_SavingQuarterly.to_dict(orient='records')
         return jsonSavingQuarterly
-
-    def Conso_VS_Solar():
-        df_Conso_vs_Solar=df1
-        df_Conso_vs_Solar=pd.merge(df_Input,df_Conso_vs_Solar, how='left', on = 'Building')
-        df_Conso_vs_Solar=df_Conso_vs_Solar[['Building','Solaire_Totale','Consommation']]
-        df_Conso_vs_Solar=df_Conso_vs_Solar.melt(id_vars='Building', var_name="Label", value_name="Value")
-        json_Conso_vs_Solar=df_Conso_vs_Solar.to_dict(orient='records')
-        return json_Conso_vs_Solar
+        
                 
     Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly(),'Conso_vs_Solar':Conso_VS_Solar()}
     return jsonify(Output)
