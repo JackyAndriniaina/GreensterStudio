@@ -11,7 +11,6 @@ def upload_json():
     df_Input =json_normalize(Input['Input'])
     df_EUTaxonomie = json_normalize(Input['EU_Taxonomy_version1'])
     df_Performance=json_normalize(Input['Draft_Performance_Tracking_Global+Predicted'])
-    df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
     df1=pd.merge(df_Input,df_EUTaxonomie, how='right', on = 'Building')
     df1_Input=pd.merge(df_Input,df_EUTaxonomie, how='right', on = 'Building')
     df2=pd.merge(df_Input,df_Performance, how='right', on = 'Building')
@@ -30,12 +29,16 @@ def upload_json():
             else:
                 df1_Input['Quotation'][i]=0.131   
         df1_Input['Saving_Self_Conso']=df1_Input['Solaire_Totale']*df1_Input['Quotation']
+        df1_Input['Saving_Self_Conso_Input']=df1_Input['Solaire']*df1_Input['Quotation']
+        df1_Input['Solaire']=df1_Input['Solaire'].astype('float').fillna(0)
         json_Energie={}
         json_Energie['Volume_Of_Generated_KWh']=df1_Input['Solaire_Totale'].sum().round(2)
         json_Energie['Volume_Of_Generated_vs_default']=((df1_Input['Solaire'].sum()*100)/df1_Input['Solaire_(panneaux_Pv)'].sum()).round(2)
         json_Energie['Self-Consumption_Rate']=((df1_Input['Solaire_Totale'].sum()/df1_Input['Consommation'].sum())*100).round(2)
         json_Energie['Self-Conso_vs_default']=((df1_Input['Solaire'].sum()/df1_Input['Consommation'].sum())*100).round(2)
         json_Energie['Saving_Self_Conso']=df1_Input['Saving_Self_Conso'].sum().round(2)
+        json_Energie['Saving_Self_Conso_vs_default']=df1_Input['Saving_Self_Conso_Input'].sum().round(2)
+        json_Energie['Percentage_Saving_Self_Conso_vs_default']=(json_Energie['Saving_Self_Conso_vs_default']*100/json_Energie['Saving_Self_Conso']).round(2)
         return json_Energie
 
     def data_Building():
@@ -169,44 +172,36 @@ def upload_json():
 
     df_Performance=df_Performance[df_Performance['Year']>2020]
     def data_BuildingYear(df_Performance):
-            df_Performance=df_Performance[df_Performance['Year']>2020]
-            df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
-            df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
-            df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
-            df_Performance.reset_index(inplace=True)
-            for i in range(0,len(df_Performance)):
-                    if df_Performance['Consommation'][i]== 0:
-                            df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
-                    else:
-                            df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
-            df_BuildingPearYear=df_Performance
-            df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
-            df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
-            df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
-            convert_dict={"Building":str,"Consommation":float,"Emission_Ges:_Scope_1_Plus_2(Kg)":float,"Year":int,"Month":int}
-            arround={"Consommation":2,"Emission_Ges:_Scope_1_Plus_2(Kg)":2}
-            df_BuildingPearYear=df_BuildingPearYear.astype(convert_dict)
-            df_BuildingPearYear=df_BuildingPearYear.round(arround)
-            jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
-            return jsonBuildingPerYear
-
-    
-    def data_SavingQuarterly():
-        df_SavingQuarterly= json_normalize(Input['SavingQuarterly'])
-        df_SavingQuarterly=df_SavingQuarterly.groupby(['Year','Quarter'])['Eco_Total_','Montant_Total_'].sum()
-        df_SavingQuarterly.reset_index(inplace=True)
-        df_SavingQuarterly['Saving_SelfConsumption']=(df_SavingQuarterly['Eco_Total_']/df_SavingQuarterly['Montant_Total_'])*100
-        df_SavingQuarterly['Saving_SelfConsumption']=df_SavingQuarterly['Saving_SelfConsumption'].round(2)
-        df_SavingQuarterly=df_SavingQuarterly[['Year','Quarter','Saving_SelfConsumption']]
-        convert_dict={'Year':int,'Quarter':str,'Saving_SelfConsumption':float}
-        arround={'Saving_SelfConsumption':2}
-        df_SavingQuarterly=df_SavingQuarterly.astype(convert_dict)
-        df_SavingQuarterly=df_SavingQuarterly.round(arround)
-        jsonSavingQuarterly=df_SavingQuarterly.to_dict(orient='records')
-        return jsonSavingQuarterly
+        df_Performance=df_Performance[df_Performance['Year']>2020]
+        df_Performance.rename(columns={"Energy_Consumption":"Consommation"},inplace=True)
+        df_Performance['Consommation']=df_Performance['Consommation'].astype('double').round(2)
+        df_Performance['Consommation']=df_Performance['Consommation'].fillna(0)
+        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)']=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'].astype('float').fillna(0)
+        df_Performance.reset_index(inplace=True)
+        for i in range(0,len(df_Performance)):
+                if df_Performance['Consommation'][i]== 0:
+                        df_Performance['Consommation'][i]=df_Performance['Energy_Consumption_predicted'][i]
+                else:
+                        df_Performance['Consommation'][i]=df_Performance['Consommation'][i]
+        for i in range(0,len(df_Performance)):
+                if df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'][i]== 0:
+                        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'][i]=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)_predicted'][i]
+                else:
+                        df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'][i]=df_Performance['Emission_Ges:_Scope_1_Plus_2(Kg)'][i]
         
-                
-    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'SavingQuarterly':data_SavingQuarterly(),'Conso_vs_Solar':Conso_VS_Solar()}
+        df_BuildingPearYear=df_Performance
+        df_BuildingPearYear=pd.merge(df_Input,df_BuildingPearYear, how='left', on = 'Building')
+        df_BuildingPearYear=df_BuildingPearYear[["Building","Consommation","Emission_Ges:_Scope_1_Plus_2(Kg)","Year","Month"]]
+        df_BuildingPearYear.sort_values(by = ['Building','Year', 'Month'], axis=0, ascending=[True, True,True], inplace=True)
+        convert_dict={"Building":str,"Consommation":float,"Emission_Ges:_Scope_1_Plus_2(Kg)":float,"Year":int,"Month":int}
+        arround={"Consommation":2,"Emission_Ges:_Scope_1_Plus_2(Kg)":2}
+        df_BuildingPearYear=df_BuildingPearYear.astype(convert_dict)
+        df_BuildingPearYear=df_BuildingPearYear.round(arround)
+        jsonBuildingPerYear=df_BuildingPearYear.to_dict(orient='records')
+        return jsonBuildingPerYear
+
+                        
+    Output={'Global':data_Global(),'CCA':data_CCA(),'CCM':data_CCM(),'Energie':data_Energie(),'Building':data_Building(),'Building_Year':data_BuildingYear(df_Performance),'Conso_vs_Solar':Conso_VS_Solar()}
     return jsonify(Output)
   
 if __name__=='__main__':
