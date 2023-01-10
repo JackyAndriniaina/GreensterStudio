@@ -211,7 +211,7 @@ def upload_json():
             if i not in Input['Input'][0]:
                 print(i)
                 missingValue.append(i)
-        Output=('input', missingValue, 'is missing')
+        Output=('Input :', missingValue, 'is missing')
         
     return jsonify(Output)
   
