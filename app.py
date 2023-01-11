@@ -14,6 +14,7 @@ def upload_json():
     df1=pd.merge(df_input,df_EUTaxonomie, how='right', on = 'Building')
     df1_input=pd.merge(df_input,df_EUTaxonomie, how='right', on = 'Building')
     df2=pd.merge(df_input,df_performance, how='right', on = 'Building')
+    
     try:    
         df1['Solaire']=df1['Solaire'].astype('double').fillna(0)
         df1['Solaire_(panneaux_Pv)']=df1['Solaire_(panneaux_Pv)'].astype('double').fillna(0)
@@ -34,7 +35,7 @@ def upload_json():
             df1_input['Solaire']=df1_input['Solaire'].astype('float').fillna(0)
             jsonEnergie={}
             jsonEnergie['Volume_Of_Generated_KWh']=df1_input['Solaire_Totale'].sum().round(2)
-            jsonEnergie['Volume_Of_Generated_vs_default']=((df1_input['Solaire'].sum()*100)/df1_input['Solaire_(panneaux_Pv)'].sum()).round(2)
+            jsonEnergie['Volume_Of_Generated_vs_default']=((df1_input['Solaire'].sum()*100)/df1_input['Solaire_Totale'].sum()).round(2)
             jsonEnergie['Self-Consumption_Rate']=((df1_input['Solaire_Totale'].sum()/df1_input['Consommation'].sum())*100).round(2)
             jsonEnergie['Self-Conso_vs_default']=((df1_input['Solaire'].sum()/df1_input['Consommation'].sum())*100).round(2)
             jsonEnergie['Saving_Self_Conso']=df1_input['Saving_Self_Conso'].sum().round(2)
@@ -211,8 +212,8 @@ def upload_json():
             if i not in Input['Input'][0]:
                 print(i)
                 missingValue.append(i)
-        Output=('Input :', missingValue, 'is missing')
-        
+        Output=('input :', missingValue, 'is missing')
+
     return jsonify(Output)
   
 if __name__=='__main__':
