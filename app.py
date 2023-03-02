@@ -9,9 +9,9 @@ app =   Flask(__name__)
 def hello_world():
     return 'Hello, World!'
 
-@app.post('/up_json')
+@app.route('/up_json', methods=['POST'])
 def upload_json():
-    Input=request.json
+    """Input=request.json
     df_input =json_normalize(Input['Input'])
     df_EUTaxonomie = json_normalize(Input['EU_Taxonomy_version1'])
     df_performance=json_normalize(Input['Draft_Performance_Tracking_Global+Predicted'])
@@ -218,7 +218,8 @@ def upload_json():
                 missingValue.append(i)
         Output=('input :', missingValue, 'is missing')
 
-    return jsonify(Output)
+    return jsonify(Output) """
+    return "haha"
   
 if __name__=='__main__':
     app.run(debug=True)
