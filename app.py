@@ -5,9 +5,9 @@ import numpy as np
 from pandas import json_normalize
 app =   Flask(__name__)
 
-@app.route('/', methods=['GET'])
+""" @app.route('/', methods=['GET'])
 def hello_world():
-    return 'Hello, World!'
+    return 'Hello, World!' """
 
 @app.route('/up_json', methods=['GET'])
 def upload_json():
