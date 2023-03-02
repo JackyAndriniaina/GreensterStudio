@@ -9,7 +9,7 @@ app =   Flask(__name__)
 def hello_world():
     return 'Hello, World!'
 
-@app.route('/up_json', methods=['POST'])
+@app.route('/test', methods=['POST'])
 def upload_json():
     """Input=request.json
     df_input =json_normalize(Input['Input'])
