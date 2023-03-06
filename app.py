@@ -224,19 +224,9 @@ if __name__=='__main__':
     app.run(debug=True) """ 
 
 from fastapi import FastAPI
-from pydantic import BaseModel
 
 app = FastAPI()
 
-class User(BaseModel):
-    name: str
-    age: int
-    email: str
-
-@app.post("/users/")
-async def create_user(user: User):
-    return {"message": f"User {user.name} created successfully!"}
-
-@app.post("/json/")
-async def process_json():
-    return {"message": "hello word"}
+@app.post("/hello/")
+async def create_hello_word():
+    return {"message": "Hello World!"}
