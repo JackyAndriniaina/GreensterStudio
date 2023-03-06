@@ -9,6 +9,10 @@ app =   Flask(__name__)
 def test():
     # handle POST request here
     return 'Success!'
+@app.route('/testt', methods=['POST'])
+def testt():
+    # handle POST request here
+    return 'Successsss!'
 """@app.route('/up_json', methods=['POST'])
 def upload_json():
     Input=request.json
