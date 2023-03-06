@@ -1,15 +1,15 @@
-"""from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request
 import json
 import pandas as pd
 import numpy as np
 from pandas import json_normalize
 app =   Flask(__name__)
 
-@app.route('/test', methods=['POST'])
+@app.route('/test', methods=['GET'])
 def test():
     # handle POST request here
     return 'Success!'
-@app.route('/up_json', methods=['POST'])
+"""@app.route('/up_json', methods=['POST'])
 def upload_json():
     Input=request.json
     df_input =json_normalize(Input['Input'])
@@ -218,19 +218,7 @@ def upload_json():
                 missingValue.append(i)
         Output=('input :', missingValue, 'is missing')
 
-    return jsonify(Output) 
+    return jsonify(Output)  """ 
     
 if __name__=='__main__':
-    app.run(debug=True) """ 
-
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.post("/hello/")
-async def create_hello_word():
-    return {"message": "Hello World!"}
-
-if __name__=='__main__':
     app.run(debug=True)
-
