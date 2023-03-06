@@ -6,15 +6,15 @@ from pandas import json_normalize
 app =   Flask(__name__)
 
 
-@app.route('/testt', methods=['POST'])
+"""@app.route('/testt', methods=['POST'])
 def testt():
     return 'Successsss!'
 
 @app.route('/test', methods=['GET'])
 def test():
     return 'Success!'
-
-"""@app.route('/up_json', methods=['POST'])
+"""
+@app.route('/up_json', methods=['POST'])
 def upload_json():
     Input=request.json
     df_input =json_normalize(Input['Input'])
@@ -223,7 +223,7 @@ def upload_json():
                 missingValue.append(i)
         Output=('input :', missingValue, 'is missing')
 
-    return jsonify(Output)  """ 
-    
+    return jsonify(Output) 
+
 if __name__=='__main__':
     app.run(debug=True)
