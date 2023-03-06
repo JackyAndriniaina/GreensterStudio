@@ -238,5 +238,5 @@ async def create_user(user: User):
     return {"message": f"User {user.name} created successfully!"}
 
 @app.post("/json/")
-async def process_json(json_data: dict):
-    return {"message": f"JSON data processed successfully: {json_data}"}
+async def process_json():
+    return {"message": "hello word"}
