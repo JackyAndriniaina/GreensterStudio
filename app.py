@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request
+"""from flask import Flask,jsonify,request
 import json
 import pandas as pd
 import numpy as np
@@ -221,4 +221,22 @@ def upload_json():
     return jsonify(Output) 
     
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(debug=True) """ 
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class User(BaseModel):
+    name: str
+    age: int
+    email: str
+
+@app.post("/users/")
+async def create_user(user: User):
+    return {"message": f"User {user.name} created successfully!"}
+
+@app.post("/json/")
+async def process_json(json_data: dict):
+    return {"message": f"JSON data processed successfully: {json_data}"}
