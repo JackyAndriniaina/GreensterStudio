@@ -8,12 +8,10 @@ app =   Flask(__name__)
 
 @app.route('/testt', methods=['POST'])
 def testt():
-    # handle POST request here
     return 'Successsss!'
 
 @app.route('/test', methods=['GET'])
 def test():
-    # handle POST request here
     return 'Success!'
 
 """@app.route('/up_json', methods=['POST'])
